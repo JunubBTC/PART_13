@@ -1,0 +1,141 @@
+### Variables
+@baseUrl = http://localhost:3001/api
+@token = YOUR_TOKEN_HERE
+
+### Health check
+GET http://localhost:3001/health
+
+### ========== USERS ==========
+
+### Register new user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Get all users
+GET {{baseUrl}}/users
+
+### Get single user
+GET {{baseUrl}}/users/1
+
+### Update user
+PUT {{baseUrl}}/users/1
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "bio": "Updated bio text"
+}
+
+### ========== LOGIN ==========
+
+### Login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "password": "password123"
+}
+
+### ========== POSTS ==========
+
+### Get all posts (Feed)
+GET {{baseUrl}}/posts
+
+### Get single post with details
+GET {{baseUrl}}/posts/1
+
+### Create post (requires token)
+POST {{baseUrl}}/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "This is my new post! #testing",
+  "imageUrl": "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800"
+}
+
+### Update post (requires token)
+PUT {{baseUrl}}/posts/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "Updated post content"
+}
+
+### Delete post (requires token)
+DELETE {{baseUrl}}/posts/1
+Authorization: Bearer {{token}}
+
+### ========== LIKES ==========
+
+### Like a post (requires token)
+POST {{baseUrl}}/likes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "postId": 1
+}
+
+### Get likes for a post
+GET {{baseUrl}}/likes/post/1
+
+### Unlike a post (requires token)
+DELETE {{baseUrl}}/likes/1
+Authorization: Bearer {{token}}
+
+### ========== COMMENTS ==========
+
+### Get comments for a post
+GET {{baseUrl}}/comments/post/1
+
+### Create comment (requires token)
+POST {{baseUrl}}/comments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "postId": 1,
+  "content": "This is a great post!"
+}
+
+### Update comment (requires token)
+PUT {{baseUrl}}/comments/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "Updated comment text"
+}
+
+### Delete comment (requires token)
+DELETE {{baseUrl}}/comments/1
+Authorization: Bearer {{token}}
+
+### ========== SHARES ==========
+
+### Share a post (requires token)
+POST {{baseUrl}}/shares
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "postId": 1,
+  "caption": "Everyone should see this!"
+}
+
+### Get shares for a post
+GET {{baseUrl}}/shares/post/1
+
+### Delete share (requires token)
+DELETE {{baseUrl}}/shares/1
+Authorization: Bearer {{token}}
