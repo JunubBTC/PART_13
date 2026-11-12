@@ -1,6 +1,6 @@
 require('dotenv').config()
 const { sequelize } = require('./db')
-const { User, Post, Like, Comment, Share } = require('../models')
+require('../models')
 
 const initDatabase = async () => {
   try {
@@ -17,6 +17,7 @@ const initDatabase = async () => {
     console.log('  - likes')
     console.log('  - comments')
     console.log('  - shares')
+    console.log('  - blogs')
 
     await sequelize.close()
     console.log('\n✅ Database initialization complete!')

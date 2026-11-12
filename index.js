@@ -5,6 +5,7 @@ const cors = require('cors')
 
 const { PORT } = require('./utils/config')
 const { connectToDatabase } = require('./utils/db')
+const { syncModels } = require('./models')
 const { tokenExtractor } = require('./middleware/auth')
 const errorHandler = require('./middleware/errorHandler')
 
@@ -14,6 +15,9 @@ const postsRouter = require('./controllers/posts')
 const likesRouter = require('./controllers/likes')
 const commentsRouter = require('./controllers/comments')
 const sharesRouter = require('./controllers/shares')
+const blogsRouter = require('./controllers/blogs')
+const authorsRouter = require('./controllers/authors')
+const { Blog } = require('./models')
 
 const app = express()
 
@@ -21,10 +25,29 @@ app.use(cors())
 app.use(express.json())
 app.use(tokenExtractor)
 
+// Exercise 17: Root endpoint
+app.get('/', (req, res) => {
+  res.status(200).send('OK')
+})
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.send('ok')
 })
+
+// Exercise 17: Reset database (for testing)
+if (process.env.TESTING === 'true') {
+  app.post('/api/reset', async (req, res) => {
+    const { Blog, User, Post, Like, Comment, Share } = require('./models')
+    await Share.destroy({ where: {} })
+    await Comment.destroy({ where: {} })
+    await Like.destroy({ where: {} })
+    await Post.destroy({ where: {} })
+    await Blog.destroy({ where: {} })
+    await User.destroy({ where: {} })
+    res.status(204).end()
+  })
+}
 
 // API routes
 app.use('/api/users', usersRouter)
@@ -33,11 +56,14 @@ app.use('/api/posts', postsRouter)
 app.use('/api/likes', likesRouter)
 app.use('/api/comments', commentsRouter)
 app.use('/api/shares', sharesRouter)
+app.use('/api/blogs', blogsRouter)
+app.use('/api/authors', authorsRouter)
 
 app.use(errorHandler)
 
 const start = async () => {
   await connectToDatabase()
+  await syncModels()
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`)
   })

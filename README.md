@@ -37,9 +37,10 @@ cd PART_13
 npm install
 ```
 
-### 2. Start PostgreSQL with Docker
+### 2. Set up PostgreSQL
 
-Make sure Docker Desktop is running, then:
+Use an Aiven PostgreSQL service, Docker, or a local PostgreSQL installation.
+For Aiven, copy the connection details from the service console. For Docker:
 
 ```bash
 docker run -d -e POSTGRES_PASSWORD=1234 -p 5432:5432 --name part13-postgres postgres
@@ -47,12 +48,23 @@ docker run -d -e POSTGRES_PASSWORD=1234 -p 5432:5432 --name part13-postgres post
 
 ### 3. Configure Environment
 
-The `.env` file is already configured:
+Set `DATABASE_URL` in the ignored `.env` file. Do not commit this file or share
+its credentials. For Aiven, omit the `?sslmode=require` parameter; the application
+configures SSL for Sequelize.
 
 ```
 DATABASE_URL=postgres://postgres:1234@localhost:5432/postgres
 PORT=3001
 SECRET=your-secret-key-change-this-in-production
+```
+
+### Run the database exercises
+
+Create and populate the `blogs` table by running the SQL in `commands.sql` in
+your PostgreSQL console. Then print the blogs with:
+
+```bash
+node cli.js
 ```
 
 ### 4. Initialize Database
@@ -119,7 +131,21 @@ Server will start on `http://localhost:3001`
 - `caption` - Optional share caption
 - `created_at`, `updated_at` - Timestamps
 
+### Blogs Table
+- `id` - Auto-incrementing primary key
+- `author` - Optional author
+- `url`, `title` - Required text fields
+- `likes` - Integer defaulting to 0
+
 ## API Endpoints
+
+### Blogs
+
+- `GET /api/blogs` - List all blogs
+- `POST /api/blogs` - Create a blog (`author`, `url`, `title`, optional `likes`)
+- `DELETE /api/blogs/:id` - Delete a blog
+
+Start the API with `npm start`.
 
 ### Authentication
 
@@ -400,4 +426,4 @@ MIT
 
 ## Author
 
-Created for Full Stack Open Part 13 Exercise
+Created by Wuor Bhang for Full Stack Open Part 13 Exercise

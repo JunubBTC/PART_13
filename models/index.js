@@ -3,6 +3,11 @@ const Post = require('./post')
 const Like = require('./like')
 const Comment = require('./comment')
 const Share = require('./share')
+const Blog = require('./blog')
+
+// User and Blog associations (for Part 13 exercises)
+User.hasMany(Blog, { foreignKey: 'userId', as: 'blogs' })
+Blog.belongsTo(User, { foreignKey: 'userId', as: 'user' })
 
 // User and Post associations
 User.hasMany(Post, { foreignKey: 'userId', as: 'posts' })
@@ -36,10 +41,21 @@ Share.belongsTo(Post, { foreignKey: 'postId', as: 'post' })
 User.belongsToMany(Post, { through: Like, as: 'likedPosts', foreignKey: 'userId' })
 Post.belongsToMany(User, { through: Like, as: 'likedByUsers', foreignKey: 'postId' })
 
+const syncModels = async () => {
+  await User.sync({ alter: true })
+  await Blog.sync({ alter: true })
+  await Post.sync({ alter: true })
+  await Like.sync({ alter: true })
+  await Comment.sync({ alter: true })
+  await Share.sync({ alter: true })
+}
+
 module.exports = {
   User,
   Post,
   Like,
   Comment,
-  Share
+  Share,
+  Blog,
+  syncModels
 }

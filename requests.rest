@@ -139,3 +139,52 @@ GET {{baseUrl}}/shares/post/1
 ### Delete share (requires token)
 DELETE {{baseUrl}}/shares/1
 Authorization: Bearer {{token}}
+
+
+### ========== BLOGS ==========
+
+### Get all blogs (with search and ordering)
+GET {{baseUrl}}/blogs
+
+### Get blogs with search (case insensitive, searches title and author)
+GET {{baseUrl}}/blogs?search=react
+
+### Get single blog
+GET {{baseUrl}}/blogs/1
+
+### Create blog (requires token)
+POST {{baseUrl}}/blogs
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "author": "Dan Abramov",
+  "url": "https://overreacted.io/",
+  "title": "Overreacted - A blog by Dan Abramov",
+  "likes": 0
+}
+
+### Update blog likes
+PUT {{baseUrl}}/blogs/1
+Content-Type: application/json
+
+{
+  "likes": 25
+}
+
+### Delete blog (requires token, only owner)
+DELETE {{baseUrl}}/blogs/1
+Authorization: Bearer {{token}}
+
+### ========== AUTHORS ==========
+
+### Get all authors with blog count and total likes
+GET {{baseUrl}}/authors
+
+### ========== TESTING ==========
+
+### Reset database (only works in test mode)
+POST {{baseUrl}}/reset
+
+### Root endpoint
+GET http://localhost:3001/
