@@ -10,7 +10,8 @@
     "test": "cross-env TESTING=true node --test --test-concurrency=1 tests/api_ch3.test.js",
     "test:connection": "node test_connection.js",
     "db:init": "node utils/init_db.js",
-    "db:seed": "node utils/seed.js"
+    "db:seed": "node utils/seed.js",
+    "migration:down": "node utils/rollback.js"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +25,8 @@
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.1",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "umzug": "^3.8.3"
   },
   "devDependencies": {
     "axios": "^1.21.1",

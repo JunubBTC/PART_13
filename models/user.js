@@ -44,6 +44,10 @@ User.init({
   disabled: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  admin: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 }, {
   sequelize,

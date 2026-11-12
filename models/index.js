@@ -41,21 +41,11 @@ Share.belongsTo(Post, { foreignKey: 'postId', as: 'post' })
 User.belongsToMany(Post, { through: Like, as: 'likedPosts', foreignKey: 'userId' })
 Post.belongsToMany(User, { through: Like, as: 'likedByUsers', foreignKey: 'postId' })
 
-const syncModels = async () => {
-  await User.sync({ alter: true })
-  await Blog.sync({ alter: true })
-  await Post.sync({ alter: true })
-  await Like.sync({ alter: true })
-  await Comment.sync({ alter: true })
-  await Share.sync({ alter: true })
-}
-
 module.exports = {
   User,
   Post,
   Like,
   Comment,
   Share,
-  Blog,
-  syncModels
+  Blog
 }

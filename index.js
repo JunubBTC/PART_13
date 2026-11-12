@@ -5,7 +5,6 @@ const cors = require('cors')
 
 const { PORT } = require('./utils/config')
 const { connectToDatabase } = require('./utils/db')
-const { syncModels } = require('./models')
 const { tokenExtractor } = require('./middleware/auth')
 const errorHandler = require('./middleware/errorHandler')
 
@@ -63,7 +62,6 @@ app.use(errorHandler)
 
 const start = async () => {
   await connectToDatabase()
-  await syncModels()
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`)
   })
