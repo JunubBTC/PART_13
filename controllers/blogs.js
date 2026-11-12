@@ -52,8 +52,9 @@ router.get('/:id', blogFinder, async (req, res) => {
 })
 
 // Exercise 10: Create blog (requires authentication)
+// Exercise 19: Added year field with validation
 router.post('/', userExtractor, async (req, res) => {
-  const { author, url, title, likes } = req.body
+  const { author, url, title, likes, year } = req.body
   const user = req.user
 
   const blog = await Blog.create({
@@ -61,6 +62,7 @@ router.post('/', userExtractor, async (req, res) => {
     url,
     title,
     likes: likes || 0,
+    year,
     userId: user.id
   })
 
@@ -76,8 +78,9 @@ router.post('/', userExtractor, async (req, res) => {
 })
 
 // Exercise 6: Update blog likes (or other fields)
+// Exercise 19: Added year field with validation
 router.put('/:id', blogFinder, async (req, res) => {
-  const { likes, author, url, title } = req.body
+  const { likes, author, url, title, year } = req.body
 
   if (likes !== undefined) {
     req.blog.likes = likes
@@ -90,6 +93,9 @@ router.put('/:id', blogFinder, async (req, res) => {
   }
   if (title !== undefined) {
     req.blog.title = title
+  }
+  if (year !== undefined) {
+    req.blog.year = year
   }
 
   await req.blog.save()

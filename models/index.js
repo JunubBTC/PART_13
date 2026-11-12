@@ -4,6 +4,8 @@ const Like = require('./like')
 const Comment = require('./comment')
 const Share = require('./share')
 const Blog = require('./blog')
+const ReadingList = require('./readingList')
+const Session = require('./session')
 
 // User and Blog associations (for Part 13 exercises)
 User.hasMany(Blog, { foreignKey: 'userId', as: 'blogs' })
@@ -41,11 +43,21 @@ Share.belongsTo(Post, { foreignKey: 'postId', as: 'post' })
 User.belongsToMany(Post, { through: Like, as: 'likedPosts', foreignKey: 'userId' })
 Post.belongsToMany(User, { through: Like, as: 'likedByUsers', foreignKey: 'postId' })
 
+// Exercise 20-24: Reading List - Many-to-Many relationship between Users and Blogs
+User.belongsToMany(Blog, { through: ReadingList, as: 'readings', foreignKey: 'userId' })
+Blog.belongsToMany(User, { through: ReadingList, as: 'readersOf', foreignKey: 'blogId' })
+
+// Exercise 25: Session management
+User.hasMany(Session, { foreignKey: 'userId', as: 'sessions' })
+Session.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+
 module.exports = {
   User,
   Post,
   Like,
   Comment,
   Share,
-  Blog
+  Blog,
+  ReadingList,
+  Session
 }

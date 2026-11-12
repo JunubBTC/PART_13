@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const router = require('express').Router()
-const { User } = require('../models')
+const { User, Session } = require('../models')
 const { SECRET } = require('../utils/config')
 
 router.post('/', async (req, res) => {
@@ -33,6 +33,12 @@ router.post('/', async (req, res) => {
   }
 
   const token = jwt.sign(userForToken, SECRET, { expiresIn: '7d' })
+
+  // Exercise 25: Store session in database
+  await Session.create({
+    userId: user.id,
+    token
+  })
 
   res.status(200).json({
     token,

@@ -22,8 +22,14 @@ router.get('/', async (req, res) => {
   res.json(users)
 })
 
-// Exercise 8 & 12: Get single user with blogs
+// Exercise 8 & 12 & 21-24: Get single user with blogs and reading list
 router.get('/:id', async (req, res) => {
+  // Exercise 24: Filter reading list by read status
+  const where = {}
+  if (req.query.read !== undefined) {
+    where.read = req.query.read === 'true'
+  }
+
   const user = await User.findByPk(req.params.id, {
     attributes: { exclude: ['passwordHash'] },
     include: [
@@ -36,6 +42,15 @@ router.get('/:id', async (req, res) => {
         model: Blog,
         as: 'blogs',
         attributes: { exclude: ['userId'] }
+      },
+      {
+        model: Blog,
+        as: 'readings',
+        attributes: { exclude: ['userId'] },
+        through: {
+          attributes: ['id', 'read'], // Exercise 22: Include join table attributes
+          where
+        }
       }
     ]
   })

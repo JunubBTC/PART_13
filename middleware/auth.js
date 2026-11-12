@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { SECRET } = require('../utils/config')
-const { User } = require('../models')
+const { User, Session } = require('../models')
 
 const tokenExtractor = (req, res, next) => {
   const authorization = req.get('authorization')
@@ -22,6 +22,15 @@ const userExtractor = async (req, res, next) => {
     
     if (!decodedToken.id) {
       return res.status(401).json({ error: 'token invalid' })
+    }
+
+    // Exercise 25: Check if session exists in database
+    const session = await Session.findOne({
+      where: { token: req.token }
+    })
+
+    if (!session) {
+      return res.status(401).json({ error: 'session expired or invalid' })
     }
 
     const user = await User.findByPk(decodedToken.id)
