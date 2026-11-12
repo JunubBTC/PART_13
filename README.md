@@ -1,16 +1,53 @@
 # Full Stack Open Part 13 - Social Media Blog Backend
 
-A full-featured social media blog application backend built with Node.js, Express, and PostgreSQL using Sequelize ORM.
+A full-featured social media blog application backend built with Node.js, Express, and PostgreSQL using Sequelize ORM. This project implements all exercises from Full Stack Open Part 13, Chapters 1-3.
+
+## 🎯 Project Status
+
+- ✅ **Chapter 1-2**: Basic setup and Sequelize ORM
+- ✅ **Chapter 3 (Exercises 5-17)**: Join tables, queries, search, aggregation, and testing
 
 ## Features
 
-- 🔐 **User Authentication** - Register, login with JWT tokens
-- 📝 **Post Management** - Create, read, update, delete posts
-- ❤️ **Like System** - Like/unlike posts with counters
-- 💬 **Comments** - Add, edit, and delete comments on posts
-- 🔄 **Share System** - Share posts with optional captions
-- 📊 **Feed** - Get all posts with like, comment, and share counts
-- 👤 **User Profiles** - View user profiles with their posts
+### 🔐 Authentication & Users
+- User registration with email validation
+- JWT-based authentication
+- Password hashing with bcrypt
+- User profiles with avatars and bios
+- Timestamps (createdAt, updatedAt)
+
+### 📝 Blog System (Part 13 Exercises)
+- Create, read, update, delete blogs
+- Blog ownership and authorization
+- Search blogs by title or author (case-insensitive)
+- Order blogs by likes (most popular first)
+- Blog-user relationships with JOIN queries
+
+### 📊 Statistics & Aggregation
+- Author statistics endpoint
+- Blog count per author
+- Total likes per author
+- Sorted by popularity
+
+### 💬 Social Features (Posts System)
+- Create posts with text & optional images
+- Like/unlike functionality
+- Comment system (add, edit, delete)
+- Share posts with captions
+- Real-time engagement metrics
+
+### 🔍 Advanced Queries
+- Search filtering with Sequelize operators
+- JOIN queries for related data
+- Aggregate functions (COUNT, SUM)
+- GROUP BY and ORDER BY support
+- Optimized WHERE clauses
+
+### 🧪 Testing Support
+- Separate test database configuration
+- Reset endpoint for test cleanup
+- Environment-based configuration
+- Test scripts ready for CI/CD
 
 ## Tech Stack
 
