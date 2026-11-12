@@ -6,6 +6,11 @@ const { userExtractor } = require('../middleware/auth')
 router.post('/', async (req, res) => {
   const { blogId, userId } = req.body
 
+  // Validate required fields
+  if (!blogId || !userId) {
+    return res.status(400).json({ error: 'blogId and userId are required' })
+  }
+
   // Validate that blog exists
   const blog = await Blog.findByPk(blogId)
   if (!blog) {
@@ -41,7 +46,7 @@ router.put('/:id', userExtractor, async (req, res) => {
 
   // User can only mark their own reading list entries
   if (readingListEntry.userId !== user.id) {
-    return res.status(403).json({ error: 'you can only modify your own reading list' })
+    return res.status(401).json({ error: 'you can only modify your own reading list' })
   }
 
   if (read !== undefined) {

@@ -36,6 +36,13 @@ module.exports = {
         allowNull: false
       }
     })
+    
+    // Add unique constraint to prevent duplicate entries
+    await queryInterface.addConstraint('reading_lists', {
+      fields: ['user_id', 'blog_id'],
+      type: 'unique',
+      name: 'unique_user_blog'
+    })
   },
   down: async ({ context: queryInterface }) => {
     await queryInterface.dropTable('reading_lists')
