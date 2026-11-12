@@ -6,22 +6,38 @@ A full-featured social media blog application backend built with Node.js, Expres
 
 - ✅ **Chapter 1-2**: Basic setup and Sequelize ORM
 - ✅ **Chapter 3 (Exercises 5-17)**: Join tables, queries, search, aggregation, and testing
+- ✅ **Chapter 4 (Exercises 18-26)**: Migrations, many-to-many relationships, reading lists, and session management
+
+**All 26 exercises completed!** 🎉
+
+See [EXERCISES_19_26_SUMMARY.md](./EXERCISES_19_26_SUMMARY.md) for detailed documentation of exercises 19-26.
 
 ## Features
 
 ### 🔐 Authentication & Users
 - User registration with email validation
-- JWT-based authentication
+- JWT-based authentication with server-side sessions
+- Session management with token revocation
+- Logout functionality (invalidates tokens)
 - Password hashing with bcrypt
 - User profiles with avatars and bios
+- Disabled user support
 - Timestamps (createdAt, updatedAt)
 
 ### 📝 Blog System (Part 13 Exercises)
 - Create, read, update, delete blogs
+- Blog year validation (1991 - current year)
 - Blog ownership and authorization
 - Search blogs by title or author (case-insensitive)
 - Order blogs by likes (most popular first)
 - Blog-user relationships with JOIN queries
+
+### 📚 Reading Lists (Chapter 4)
+- Users can add blogs to personal reading lists
+- Mark blogs as read/unread
+- Filter reading list by read status
+- Many-to-many relationship between users and blogs
+- Unique constraint prevents duplicate entries
 
 ### 📊 Statistics & Aggregation
 - Author statistics endpoint
@@ -47,14 +63,17 @@ A full-featured social media blog application backend built with Node.js, Expres
 - Separate test database configuration
 - Reset endpoint for test cleanup
 - Environment-based configuration
-- Test scripts ready for CI/CD
+- GitHub Actions CI/CD pipeline
+- 34 automated tests (all passing)
+- Test scripts for both Chapter 3 and Chapter 4
 
 ## Tech Stack
 
 - **Node.js** - Runtime environment
 - **Express** - Web framework
-- **PostgreSQL** - Relational database
+- **PostgreSQL** - Relational database (Aiven cloud)
 - **Sequelize** - ORM (Object-Relational Mapping)
+- **Umzug** - Database migrations
 - **JWT** - Authentication
 - **bcrypt** - Password hashing
 
@@ -69,7 +88,7 @@ A full-featured social media blog application backend built with Node.js, Expres
 ### 1. Clone and Install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/JunubBTC/PART_13
 cd PART_13
 npm install
 ```
@@ -80,7 +99,7 @@ Use an Aiven PostgreSQL service, Docker, or a local PostgreSQL installation.
 For Aiven, copy the connection details from the service console. For Docker:
 
 ```bash
-docker run -d -e POSTGRES_PASSWORD=1234 -p 5432:5432 --name part13-postgres postgres
+docker run -d -e POSTGRES_PASSWORD=Your_PASSWORD -p 5432:5432 --name part13-postgres postgres
 ```
 
 ### 3. Configure Environment
@@ -90,7 +109,7 @@ its credentials. For Aiven, omit the `?sslmode=require` parameter; the applicati
 configures SSL for Sequelize.
 
 ```
-DATABASE_URL=postgres://postgres:1234@localhost:5432/postgres
+DATABASE_URL=postgres://postgres:YOUR_PASSWORD@localhost:5432/postgres
 PORT=3001
 SECRET=your-secret-key-change-this-in-production
 ```
@@ -173,16 +192,107 @@ Server will start on `http://localhost:3001`
 - `author` - Optional author
 - `url`, `title` - Required text fields
 - `likes` - Integer defaulting to 0
+- `year` - Optional integer (1991 - current year)
+- `user_id` - Foreign key to users
+- `created_at`, `updated_at` - Timestamps
+
+### Reading Lists Table (Chapter 4)
+- `id` - Primary key
+- `user_id` - Foreign key to users
+- `blog_id` - Foreign key to blogs
+- `read` - Boolean (default: false)
+- Unique constraint on (user_id, blog_id)
+- `created_at`, `updated_at` - Timestamps
+
+### Sessions Table (Chapter 4)
+- `id` - Primary key
+- `user_id` - Foreign key to users
+- `token` - JWT token (unique)
+- `created_at`, `updated_at` - Timestamps
 
 ## API Endpoints
 
 ### Blogs
 
-- `GET /api/blogs` - List all blogs
-- `POST /api/blogs` - Create a blog (`author`, `url`, `title`, optional `likes`)
-- `DELETE /api/blogs/:id` - Delete a blog
+- `GET /api/blogs` - List all blogs (with search & ordering)
+- `GET /api/blogs/:id` - Get single blog
+- `POST /api/blogs` - Create a blog (requires auth)
+- `PUT /api/blogs/:id` - Update a blog (likes, year, etc.)
+- `DELETE /api/blogs/:id` - Delete a blog (requires auth, own blog)
 
-Start the API with `npm start`.
+**Search & Filter:**
+```
+GET /api/blogs?search=react     - Search in title or author
+```
+
+**Create Blog with Year:**
+```
+POST /api/blogs
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "My Blog Post",
+  "author": "John Doe",
+  "url": "https://example.com/post",
+  "year": 2026
+}
+```
+
+### Reading Lists (Chapter 4)
+
+```
+POST /api/readinglists          - Add blog to reading list
+PUT /api/readinglists/:id       - Mark blog as read (requires auth)
+```
+
+**Add to Reading List:**
+```
+POST /api/readinglists
+Content-Type: application/json
+
+{
+  "blogId": 1,
+  "userId": 2
+}
+```
+
+**Mark as Read:**
+```
+PUT /api/readinglists/1
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "read": true
+}
+```
+
+**Get User with Reading List:**
+```
+GET /api/users/1                    - All readings
+GET /api/users/1?read=true          - Only read blogs
+GET /api/users/1?read=false         - Only unread blogs
+```
+
+### Session Management (Chapter 4)
+
+```
+POST /api/login                 - Login (creates session)
+DELETE /api/logout              - Logout (invalidates token, requires auth)
+```
+
+**Logout:**
+```
+DELETE /api/logout
+Authorization: Bearer <token>
+```
+
+### Authors & Statistics
+
+```
+GET /api/authors                - Get author statistics (blog count, total likes)
+```
 
 ### Authentication
 
@@ -322,31 +432,52 @@ After running `npm run db:seed`, you can test with these credentials:
 
 ```
 PART_13/
-├── controllers/          # Route handlers
+├── .github/
+│   └── workflows/
+│       └── test.yml        # GitHub Actions CI/CD
+├── controllers/            # Route handlers
+│   ├── authors.js         # Author statistics
+│   ├── blogs.js           # Blog CRUD
 │   ├── comments.js
 │   ├── likes.js
 │   ├── login.js
+│   ├── logout.js          # Session management
 │   ├── posts.js
+│   ├── readingLists.js    # Reading list API
 │   ├── shares.js
 │   └── users.js
-├── middleware/          # Custom middleware
-│   ├── auth.js         # Authentication
+├── middleware/             # Custom middleware
+│   ├── auth.js            # Authentication & sessions
 │   └── errorHandler.js
-├── models/             # Sequelize models
+├── migrations/             # Database migrations
+│   ├── 20261112_00_initialize_users_and_blogs.js
+│   ├── 20261112_01_add_year_to_blogs.js
+│   ├── 20261112_02_add_reading_lists.js
+│   └── 20261112_03_add_sessions.js
+├── models/                 # Sequelize models
+│   ├── blog.js
 │   ├── comment.js
-│   ├── index.js        # Model associations
+│   ├── index.js           # Model associations
 │   ├── like.js
 │   ├── post.js
+│   ├── readingList.js     # Reading list model
+│   ├── session.js         # Session model
 │   ├── share.js
 │   └── user.js
-├── utils/              # Utility functions
-│   ├── config.js       # Environment config
-│   ├── db.js          # Database connection
-│   ├── init_db.js     # Database initialization
-│   └── seed.js        # Sample data seeder
-├── .env               # Environment variables
+├── tests/                  # API tests
+│   ├── api_ch3.test.js    # Chapter 3 tests
+│   ├── api_ch4.test.js    # Chapter 4 tests
+│   └── helper.js          # Test helpers
+├── utils/                  # Utility functions
+│   ├── config.js          # Environment config
+│   ├── db.js             # Database connection & Umzug
+│   ├── drop_all_tables.js # Development utility
+│   ├── rollback.js        # Migration rollback
+│   └── seed.js           # Sample data seeder
+├── .env                   # Environment variables (gitignored)
 ├── .gitignore
-├── index.js           # Application entry point
+├── EXERCISES_19_26_SUMMARY.md  # Detailed documentation
+├── index.js               # Application entry point
 ├── package.json
 └── README.md
 ```
@@ -357,15 +488,56 @@ PART_13/
 # Start development server with auto-reload
 npm run dev
 
+# Start production server
+npm start
+
+# Start test server (with /api/reset endpoint)
+npm run start:test
+
 # Test database connection
 npm run test:connection
 
-# Initialize database tables
-npm run db:init
+# Run migrations down (rollback last migration)
+npm run migration:down
 
 # Seed database with sample data
 npm run db:seed
 ```
+
+## Testing
+
+```bash
+# Run Chapter 3 tests (8 tests)
+TESTING=true node --test --test-concurrency=1 tests/api_ch3.test.js
+
+# Run Chapter 4 tests (26 tests)
+TESTING=true node --test --test-concurrency=1 tests/api_ch4.test.js
+
+# Run all tests via npm
+npm test
+```
+
+**Test Requirements:**
+- Server must be running in test mode (`npm run start:test`)
+- Uses TEST_DATABASE_URL from .env
+- Runs on http://localhost:3001
+
+## Migrations
+
+This project uses [Umzug](https://github.com/sequelize/umzug) for database migrations.
+
+```bash
+# Migrations run automatically on npm start
+
+# To rollback last migration:
+npm run migration:down
+```
+
+**Migration Files:**
+- `20261112_00_initialize_users_and_blogs.js` - Initial schema
+- `20261112_01_add_year_to_blogs.js` - Add year field to blogs
+- `20261112_02_add_reading_lists.js` - Reading lists table
+- `20261112_03_add_sessions.js` - Sessions table
 
 ## Docker Commands
 
@@ -401,9 +573,11 @@ SECRET=your-secret-key-here
 
 - Passwords are hashed using bcrypt (10 salt rounds)
 - JWT tokens expire after 7 days
-- All authenticated routes require valid JWT token
+- Server-side session management prevents token reuse after logout
+- All authenticated routes require valid JWT token AND active session
 - Users can only modify their own content
-- Disabled accounts cannot log in
+- Disabled accounts cannot log in or perform actions
+- Tokens are invalidated on logout
 
 ## Example API Usage
 
