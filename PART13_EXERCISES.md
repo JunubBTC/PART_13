@@ -491,3 +491,51 @@ PART_13/
 ---
 
 **All Chapter 3 exercises (5-17) are complete! ✅**
+
+
+---
+
+## Testing Setup Verified ✅
+
+### Files Added:
+- `.github/workflows/test.yml` - GitHub Actions workflow for CI/CD
+- `tests/api_ch3.test.js` - Comprehensive API tests
+- `tests/api_ch4.test.js` - Chapter 4 tests (for future use)
+- `tests/helper.js` - Test utilities and database seeding
+
+### Dependencies Added:
+```json
+{
+  "devDependencies": {
+    "axios": "^1.7.9",
+    "cross-env": "^7.0.3",
+    "wait-on": "^8.0.3"
+  }
+}
+```
+
+### Windows Compatibility:
+Updated npm scripts to use `cross-env` for cross-platform environment variable support:
+```json
+{
+  "start:test": "cross-env TESTING=true node index.js",
+  "test": "cross-env TESTING=true node --test --test-concurrency=1 tests/api_ch3.test.js"
+}
+```
+
+### Running Tests Locally:
+```bash
+# Terminal 1: Start test server
+npm run start:test
+
+# Terminal 2: Run tests
+npm test
+```
+
+### GitHub Actions:
+Tests run automatically on every push to main branch. Check results at:
+https://github.com/JunubBTC/PART_13/actions
+
+---
+
+**All Chapter 3 exercises (5-17) complete with automated testing! ✅🎉**
